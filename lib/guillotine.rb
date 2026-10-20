@@ -66,6 +66,8 @@ module Guillotine
     #
     # Returns an Addressable::URI.
     def parse_url(url, options)
+      # nil.to_s returns a frozen "" on Ruby 2.7+, so copy frozen input first.
+      url = url.dup if url.frozen?
       url.gsub!(/\s/, '')
       url.gsub!(/\?.*/, '') if options.strip_query?
       url.gsub!(/\#.*/, '') if options.strip_anchor?
