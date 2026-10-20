@@ -1,3 +1,4 @@
+ENV['APP_ENV'] ||= 'test' # Sinatra 4.1+ only allows localhost hosts in development; Rack::Test uses example.org.
 require 'test/unit'
 require File.expand_path('../../lib/guillotine', __FILE__)
 require 'rack/test'
