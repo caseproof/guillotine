@@ -125,6 +125,11 @@ module Guillotine
       assert_equal 422, last_response.status
     end
 
+    def test_add_with_empty_url
+      post '/', :url => ''
+      assert_equal 422, last_response.status
+    end
+
     def test_add_url_with_linebreak
       post '/', :url => "https://abc.com\n"
       assert_equal 'http://example.org/SWtBvQ', last_response.headers['location']

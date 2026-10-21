@@ -61,14 +61,14 @@ module Guillotine
 
     # Parses and sanitizes a URL.
     #
-    # url     - A String URL.
+    # url     - A String URL. It is not modified.
     # options - A Guillotine::Service::Options object.
     #
     # Returns an Addressable::URI.
     def parse_url(url, options)
-      url.gsub!(/\s/, '')
-      url.gsub!(/\?.*/, '') if options.strip_query?
-      url.gsub!(/\#.*/, '') if options.strip_anchor?
+      url = url.gsub(/\s/, '')
+      url = url.gsub(/\?.*/, '') if options.strip_query?
+      url = url.gsub(/\#.*/, '') if options.strip_anchor?
       Addressable::URI.parse(url)
     end
 

@@ -19,9 +19,10 @@ module Guillotine
       assert_equal url, head['Location']
     end
 
-    def test_adding_a_link_with_query_param_returns_code
-      url = 'http://github.com?a=1'
-      status, head, body = @service.create(url)
+    def test_adding_a_link_with_query_params_strips_query
+      query_url = 'http://github.com?a=1'
+      url = 'http://github.com'
+      status, head, body = @service.create(query_url)
       assert_equal 201, status
       assert code_url = head['Location']
       code = code_url.gsub(/.*\//, '')
@@ -70,6 +71,7 @@ module Guillotine
 
       status, head, body = @service.get('split')
       assert_equal "http://abc.comhttp//def.com", head['Location']
+      assert_equal "http://abc.com\nhttp//def.com", @db.find('split')
     end
 
     def test_clashing_urls_raises_error
@@ -81,6 +83,30 @@ module Guillotine
     def test_add_without_url
       status, head, body = @service.create(nil)
       assert_equal 422, status
+    end
+
+    def test_add_with_blank_url
+      ['', " \n"].each do |url|
+        status, head, body = @service.create(url)
+        assert_equal 422, status, url.inspect
+      end
+    end
+
+    def test_add_does_not_modify_url
+      url = String.new('http://github.com?a=1#b')
+      status, head, body = @service.create(url)
+      assert_equal 201, status
+      assert_equal 'http://github.com?a=1#b', url
+    end
+
+    def test_add_frozen_url
+      url = 'http://github.com?a=1'.freeze
+      status, head, body = @service.create(url)
+      assert_equal 201, status
+
+      status, head, body = @service.get(head['Location'])
+      assert_equal 302, status
+      assert_equal 'http://github.com', head['Location']
     end
 
     def test_add_url_with_linebreak
